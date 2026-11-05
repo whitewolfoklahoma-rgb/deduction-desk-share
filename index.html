@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deduction Desk — Supplier Deduction &amp; Dispute Workspace (Demo)</title>
+<style>
+  :root{
+    --navy:#12263a; --navy2:#1b3a55; --ink:#1c2733; --mut:#5b6b7a; --line:#d9e1e8;
+    --bg:#eef2f5; --card:#ffffff; --accent:#0f7a4d; --accent2:#0b5cad;
+    --red:#c0392b; --redbg:#fdecea; --amber:#a86e00; --amberbg:#fdf3e0;
+    --green:#0f7a4d; --greenbg:#e7f5ee; --greybg:#eef1f4;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:14px;}
+  header{background:var(--navy); color:#fff; padding:14px 28px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;}
+  header .logo{font-size:20px; font-weight:700; letter-spacing:.3px;}
+  header .logo span{color:#7fd1a8;}
+  header .sub{color:#b9c9d6; font-size:12.5px;}
+  header .demo-badge{margin-left:auto; background:#f5b301; color:#231a00; font-weight:700; font-size:12px; padding:5px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:.6px;}
+  .companybar{background:var(--navy2); color:#dbe7f1; padding:8px 28px; font-size:13px; display:flex; gap:24px; flex-wrap:wrap;}
+  .companybar b{color:#fff;}
+  nav{display:flex; gap:4px; background:#fff; border-bottom:1px solid var(--line); padding:0 20px; position:sticky; top:0; z-index:5;}
+  nav button{background:none; border:none; border-bottom:3px solid transparent; padding:13px 16px; font-size:14px; font-weight:600; color:var(--mut); cursor:pointer;}
+  nav button:hover{color:var(--ink);}
+  nav button.active{color:var(--navy); border-bottom-color:var(--accent);}
+  main{max-width:1180px; margin:0 auto; padding:24px 20px 40px;}
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+  h2{font-size:18px; margin-bottom:4px; color:var(--navy);}
+  .pdesc{color:var(--mut); margin-bottom:18px; font-size:13px;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:22px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px;}
+  .card .lbl{font-size:12px; text-transform:uppercase; letter-spacing:.7px; color:var(--mut); font-weight:700;}
+  .card .big{font-size:30px; font-weight:800; margin:6px 0 2px; color:var(--navy);}
+  .card .note{font-size:12.5px; color:var(--mut);}
+  .card.risk .big{color:var(--red);}
+  .card.rec .big{color:var(--green);}
+  .ticker{background:var(--navy); color:#fff; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+  .ticker .t-lbl{font-size:12px; text-transform:uppercase; letter-spacing:.7px; color:#9fc3e0; font-weight:700;}
+  .ticker .t-val{font-size:24px; font-weight:800; font-variant-numeric:tabular-nums;}
+  .ticker .t-what{color:#dbe7f1; font-size:13px;}
+  table{width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  th{background:#f2f6f9; text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.5px; color:var(--mut); padding:10px 12px; border-bottom:1px solid var(--line);}
+  td{padding:10px 12px; border-bottom:1px solid #edf1f4; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .amt{font-weight:700; white-space:nowrap;}
+  .pill{display:inline-block; padding:2px 9px; border-radius:12px; font-size:11.5px; font-weight:700;}
+  .pill.shortage{background:#fdecea; color:#8f2d20;}
+  .pill.pricing{background:#fdf3e0; color:#7d5700;}
+  .pill.otif{background:#e8effc; color:#274b8f;}
+  .pill.sqep{background:#efe7fb; color:#553a8f;}
+  .days{font-weight:800; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .days.ok{color:var(--green);}
+  .days.warn{color:var(--amber);}
+  .days.crit{color:var(--red);}
+  .days.exp{color:#fff; background:var(--red); padding:2px 8px; border-radius:6px; font-size:12px;}
+  select.status{padding:5px 7px; border:1px solid var(--line); border-radius:6px; font-size:13px; background:#fff; cursor:pointer;}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; align-items:center;}
+  .chip{border:1px solid var(--line); background:#fff; padding:6px 14px; border-radius:18px; font-size:13px; font-weight:600; color:var(--mut); cursor:pointer;}
+  .chip:hover{border-color:var(--accent2); color:var(--accent2);}
+  .chip.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .searchbox{margin-left:auto; padding:7px 12px; border:1px solid var(--line); border-radius:8px; font-size:13px; min-width:220px;}
+  .toolbar-note{color:var(--mut); font-size:12.5px; margin-top:10px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:900px){ .grid2{grid-template-columns:1fr;} }
+  .box{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:18px 20px;}
+  .box h3{font-size:15px; color:var(--navy); margin-bottom:12px;}
+  .docrow{display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid #eef1f4;}
+  .docrow:last-child{border-bottom:none;}
+  .docrow input[type=checkbox]{width:17px; height:17px; margin-top:1px; cursor:pointer; accent-color:var(--accent);}
+  .docrow .dn{font-weight:600;}
+  .docrow .dd{color:var(--mut); font-size:12.5px;}
+  .docrow .tag{margin-left:auto; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; white-space:nowrap;}
+  .tag.have{color:var(--green);}
+  .tag.miss{color:var(--red);}
+  .meter{height:10px; background:#e6ecf1; border-radius:6px; overflow:hidden; margin:10px 0 6px;}
+  .meter > div{height:100%; background:var(--accent); width:0%; transition:width .3s;}
+  .btn{background:var(--accent2); color:#fff; border:none; padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:700; cursor:pointer;}
+  .btn:hover{background:#094d86;}
+  .btn.secondary{background:#fff; color:var(--navy); border:1px solid var(--line);}
+  .btn.secondary:hover{border-color:var(--navy);}
+  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  .letter{background:#fffdf7; border:1px solid #e4dcc3; border-radius:8px; padding:22px 24px; font-family:Georgia,"Times New Roman",serif; font-size:13.5px; line-height:1.55; white-space:pre-wrap; color:#222;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--mut); margin-bottom:5px;}
+  .field input, .field select{width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:7px; font-size:14px; background:#fff;}
+  .shipgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px;}
+  .shipitem{display:flex; gap:11px; padding:12px 0; border-bottom:1px solid #eef1f4; align-items:flex-start;}
+  .shipitem:last-child{border-bottom:none;}
+  .shipitem input[type=checkbox]{width:18px; height:18px; margin-top:2px; cursor:pointer; accent-color:var(--accent);}
+  .shipitem .sn{font-weight:600;}
+  .shipitem .sd{color:var(--mut); font-size:12.5px;}
+  .shipitem .fine{margin-left:auto; text-align:right; white-space:nowrap;}
+  .shipitem .fine .fv{font-weight:800;}
+  .shipitem .fine .fs{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px;}
+  .fs.avoided{color:var(--green);} .fs.exposed{color:var(--red);}
+  .summary-strip{display:flex; gap:14px; flex-wrap:wrap; margin-top:16px;}
+  .summary-strip .ss{flex:1; min-width:180px; border-radius:10px; padding:14px 16px; border:1px solid var(--line); background:#fff;}
+  .summary-strip .ss .v{font-size:22px; font-weight:800;}
+  .minirow{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eef1f4; font-size:13.5px;}
+  .minirow:last-child{border-bottom:none;}
+  .linkbtn{background:none; border:none; color:var(--accent2); font-weight:700; cursor:pointer; font-size:13px; padding:0;}
+  .linkbtn:hover{text-decoration:underline;}
+  footer{max-width:1180px; margin:0 auto; padding:0 20px 30px; color:var(--mut); font-size:12.5px; line-height:1.6;}
+  footer .safety{background:#fff; border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; padding:12px 16px; margin-bottom:12px;}
+  .copied-msg{color:var(--green); font-weight:700; font-size:13px; margin-left:6px; display:none;}
+  @media print{
+    header, nav, .companybar, footer, .no-print{display:none !important;}
+    body{background:#fff;}
+    section.panel{display:none !important;}
+    section#panel-packet{display:block !important;}
+    .box{border:none; padding:0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Deduction<span>Desk</span></div>
+    <div class="sub">Supplier deduction tracking, deadline control &amp; dispute packets</div>
+  </div>
+  <div class="demo-badge">Demo — sample data</div>
+</header>
+<div class="companybar">
+  <div>Workspace: <b>Harvest Valley Foods, Inc.</b> (fictional demo company)</div>
+  <div>Quarter: <b id="qtrLabel">QTD</b></div>
+  <div>Data source: <b>files you export yourself — no portal logins, ever</b></div>
+</div>
+
+<nav id="tabs">
+  <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="tracker">Deduction Tracker</button>
+  <button data-tab="packet">Dispute Packet Generator</button>
+  <button data-tab="preship">Pre-Shipment Checklist</button>
+</nav>
+
+<main>
+
+<!-- ============ DASHBOARD ============ -->
+<section class="panel active" id="panel-dashboard">
+  <h2>Dashboard</h2>
+  <p class="pdesc">Every deduction, its deadline, and its dollars — in one place, before any of it expires unworked.</p>
+
+  <div class="ticker no-print">
+    <div>
+      <div class="t-lbl">Next dispute deadline</div>
+      <div class="t-val" id="nextDeadlineVal">—</div>
+    </div>
+    <div class="t-what" id="nextDeadlineWhat">—</div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="lbl">Total deductions this quarter</div>
+      <div class="big" id="statTotal">$0</div>
+      <div class="note" id="statTotalNote">—</div>
+    </div>
+    <div class="card risk">
+      <div class="lbl">$ Still at risk (open)</div>
+      <div class="big" id="statRisk">$0</div>
+      <div class="note" id="statRiskNote">—</div>
+    </div>
+    <div class="card rec">
+      <div class="lbl">$ Recovered (won)</div>
+      <div class="big" id="statWon">$0</div>
+      <div class="note" id="statWonNote">—</div>
+    </div>
+    <div class="card">
+      <div class="lbl">Deadlines in next 7 days</div>
+      <div class="big" id="statWeek">0</div>
+      <div class="note" id="statWeekNote">—</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <h3>Due this week — work these first</h3>
+      <div id="dueWeekList"></div>
+    </div>
+    <div class="box">
+      <h3>Where the money leaks (by type)</h3>
+      <div id="byTypeList"></div>
+      <div class="minirow" style="margin-top:8px; border-top:1px solid var(--line); padding-top:10px;">
+        <span style="color:var(--red); font-weight:700;">Expired &amp; never worked</span>
+        <span class="amt" style="color:var(--red);" id="expiredTotal">$0</span>
+      </div>
+      <p class="toolbar-note">Deductions whose dispute window closed before anyone touched them. This is the number this workspace exists to drive to zero.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRACKER ============ -->
+<section class="panel" id="panel-tracker">
+  <h2>Deduction Tracker</h2>
+  <p class="pdesc">One record per deduction. Deadlines count down live — red means under 7 days. Change a status and the dashboard updates with it.</p>
+
+  <div class="chips no-print" id="filterChips">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="open">Open</button>
+    <button class="chip" data-filter="due7">Due ≤ 7 days</button>
+    <button class="chip" data-filter="submitted">Submitted</button>
+    <button class="chip" data-filter="won">Won</button>
+    <button class="chip" data-filter="lost">Lost</button>
+    <input class="searchbox" id="trackerSearch" type="text" placeholder="Search PO, invoice, or code…">
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Deduction</th><th>Type</th><th>PO / Invoice</th><th>Amount</th>
+        <th>Dispute deadline</th><th>Time left</th><th>Status</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="trackerBody"></tbody>
+  </table>
+  <p class="toolbar-note" id="trackerSummary"></p>
+</section>
+
+<!-- ============ PACKET ============ -->
+<section class="panel" id="panel-packet">
+  <h2>Dispute Packet Generator</h2>
+  <p class="pdesc">Pick a deduction. The packet assembles itself — dispute letter plus the proof checklist for that deduction type. You upload the finished packet into the retailer's portal yourself; this tool never submits anything.</p>
+
+  <div class="field" style="max-width:560px;">
+    <label for="packetSelect">Deduction to build a packet for</label>
+    <select id="packetSelect"></select>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <h3>Proof documents</h3>
+      <div id="docList"></div>
+      <div class="meter"><div id="docMeter"></div></div>
+      <div class="toolbar-note" id="docMeterNote"></div>
+      <div class="btnrow no-print">
+        <button class="btn" id="btnCopyLetter">Copy dispute letter</button>
+        <button class="btn secondary" id="btnPrintPacket">Print packet</button>
+        <span class="copied-msg" id="copiedMsg">Letter copied ✓</span>
+      </div>
+    </div>
+    <div class="box">
+      <h3>Dispute letter — ready to send</h3>
+      <div class="letter" id="letterText"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRE-SHIPMENT ============ -->
+<section class="panel" id="panel-preship">
+  <h2>Pre-Shipment Checklist</h2>
+  <p class="pdesc">Catch the fine before the truck leaves. Every unchecked box shows the exact fine it risks, priced from the published OTIF / SQEP fine structure. Rules are defaults — verify against your own supplier agreement.</p>
+
+  <div class="box" style="margin-bottom:18px;">
+    <div class="shipgrid">
+      <div class="field"><label for="psPO">PO number</label><input id="psPO" type="text" value="PO 8841330"></div>
+      <div class="field"><label for="psCases">Cases on load</label><input id="psCases" type="number" min="0" value="840"></div>
+      <div class="field"><label for="psPallets">Pallets on load</label><input id="psPallets" type="number" min="0" value="22"></div>
+      <div class="field"><label for="psCogs">Cost of goods / case ($)</label><input id="psCogs" type="number" min="0" step="0.01" value="18.40"></div>
+    </div>
+    <div id="shipList"></div>
+    <div class="summary-strip">
+      <div class="ss"><div class="lbl" style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mut); font-weight:700;">Fine exposure remaining</div><div class="v" style="color:var(--red);" id="psExposed">$0</div></div>
+      <div class="ss"><div class="lbl" style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mut); font-weight:700;">Exposure cleared</div><div class="v" style="color:var(--green);" id="psAvoided">$0</div></div>
+      <div class="ss"><div class="lbl" style="font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--mut); font-weight:700;">Load readiness</div><div class="v" id="psScore">0%</div></div>
+    </div>
+    <div class="btnrow no-print">
+      <button class="btn secondary" id="btnResetShip">Reset checklist</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="safety"><b>How this works — and what it never does:</b> Deduction Desk runs entirely from files you export yourself (your POs, invoices, shipment records, and the deduction notices you received). We never ask for your Retail Link login, we never sign in as you, and we never submit disputes for you — Walmart's own vendor rules terminate supplier access for credential sharing, so the finished packet is yours to upload. Your data stays on your machine.</div>
+  <div>Demo with fictional sample data · A White Wolf Apps working demo · Questions: whitewolfbackoffice@gmail.com</div>
+</footer>
+
+<script>
+"use strict";
+const DAY = 86400000;
+function dOff(n, hour){ const d = new Date(); d.setDate(d.getDate()+n); d.setHours(hour==null?17:hour,0,0,0); return d; }
+function fmt(n){ return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmt0(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+function daysLeft(dl){ return Math.floor((dl - Date.now()) / DAY); }
+
+const DOCS = {
+  pod:    {name:"Signed proof of delivery (POD)", desc:"Carrier-signed delivery receipt showing date, time, and case count received."},
+  invoice:{name:"Commercial invoice", desc:"The invoice exactly as billed — item, quantity, and price lines."},
+  asn:    {name:"ASN copy (EDI 856)", desc:"The advance ship notice as transmitted, with SSCC / barcode data."},
+  bol:    {name:"Bill of lading", desc:"BOL matching the ASN and the invoice quantities."},
+  appt:   {name:"Carrier appointment confirmation", desc:"Scheduled delivery appointment record for the load."},
+  label:  {name:"Label & barcode photo record", desc:"Photos of case/pallet labels as shipped, showing scannable barcodes."},
+  price:  {name:"Price authorization / cost sheet", desc:"The agreed cost on file for the PO period, showing the billed price was authorized."}
+};
+
+const STATUSES = [
+  ["new","New"], ["gathering","Gathering proof"], ["ready","Packet ready"],
+  ["submitted","Submitted"], ["won","Won"], ["lost","Lost"]
+];
+const OPEN = ["new","gathering","ready","submitted"];
+
+/* Fictional sample data — Harvest Valley Foods, Inc. is a made-up company. */
+let deductions = [
+  {id:"DED-2317", date:dOff(-9),  retailer:"Walmart", code:"OTIF · Code 88 — late arrival", type:"otif", typeLabel:"OTIF fine",
+   po:"PO 8841207", inv:"INV-55213", amount:1842.50, deadline:dOff(2), status:"gathering",
+   docs:{pod:true, invoice:true, asn:true, bol:false, appt:false}},
+  {id:"DED-2321", date:dOff(-14), retailer:"Walmart", code:"Shortage · Code 21 — case shortage claim", type:"shortage", typeLabel:"Shortage",
+   po:"PO 8840982", inv:"INV-55187", amount:964.80, deadline:dOff(4), status:"new",
+   docs:{pod:false, invoice:true, asn:true, bol:false}},
+  {id:"DED-2309", date:dOff(-21), retailer:"Walmart", code:"SQEP · ASN/barcode defect", type:"sqep", typeLabel:"SQEP compliance fine",
+   po:"PO 8840715", inv:"INV-55102", amount:612.00, deadline:dOff(6), status:"ready",
+   docs:{pod:true, invoice:true, asn:true, bol:true, label:true}},
+  {id:"DED-2326", date:dOff(-6),  retailer:"Walmart", code:"Pricing · Code 57 — price mismatch", type:"pricing", typeLabel:"Pricing mismatch",
+   po:"PO 8841301", inv:"INV-55240", amount:2310.75, deadline:dOff(11), status:"gathering",
+   docs:{invoice:true, price:false, asn:false}},
+  {id:"DED-2298", date:dOff(-33), retailer:"Walmart", code:"OTIF · Code 89 — short shipment", type:"otif", typeLabel:"OTIF fine",
+   po:"PO 8840310", inv:"INV-55044", amount:1489.20, deadline:dOff(19), status:"new",
+   docs:{pod:false, invoice:true, asn:false, bol:false, appt:true}},
+  {id:"DED-2287", date:dOff(-47), retailer:"Target", code:"Compliance · label placement fine", type:"sqep", typeLabel:"SQEP compliance fine",
+   po:"PO 7712044", inv:"INV-54981", amount:388.00, deadline:dOff(26), status:"new",
+   docs:{pod:true, invoice:true, label:false}},
+  {id:"DED-2274", date:dOff(-58), retailer:"Walmart", code:"Shortage · Code 21 — case shortage claim", type:"shortage", typeLabel:"Shortage",
+   po:"PO 8839905", inv:"INV-54910", amount:720.40, deadline:dOff(-6), status:"new",
+   docs:{pod:false, invoice:false, asn:false, bol:false}},
+  {id:"DED-2260", date:dOff(-66), retailer:"Walmart", code:"OTIF · Code 88 — late arrival", type:"otif", typeLabel:"OTIF fine",
+   po:"PO 8839518", inv:"INV-54866", amount:1975.00, deadline:dOff(9), status:"submitted",
+   docs:{pod:true, invoice:true, asn:true, bol:true, appt:true}},
+  {id:"DED-2241", date:dOff(-74), retailer:"Walmart", code:"Pricing · Code 57 — price mismatch", type:"pricing", typeLabel:"Pricing mismatch",
+   po:"PO 8839202", inv:"INV-54801", amount:1130.25, deadline:dOff(-20), status:"won",
+   docs:{invoice:true, price:true, asn:true}},
+  {id:"DED-2228", date:dOff(-81), retailer:"Walmart", code:"SQEP · pallet Ti/Hi defect", type:"sqep", typeLabel:"SQEP compliance fine",
+   po:"PO 8838844", inv:"INV-54755", amount:445.00, deadline:dOff(-31), status:"lost",
+   docs:{pod:true, invoice:true, label:true}}
+];
+
+/* ---------- Tabs ---------- */
+const tabBtns = document.querySelectorAll("#tabs button");
+tabBtns.forEach(btn => btn.addEventListener("click", () => showTab(btn.dataset.tab)));
+function showTab(name){
+  tabBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll("section.panel").forEach(p => p.classList.toggle("active", p.id === "panel-" + name));
+}
+
+/* ---------- Dashboard ---------- */
+function renderDashboard(){
+  const total = deductions.reduce((s,d) => s + d.amount, 0);
+  const open  = deductions.filter(d => OPEN.includes(d.status));
+  const risk  = open.reduce((s,d) => s + d.amount, 0);
+  const won   = deductions.filter(d => d.status === "won");
+  const wonSum = won.reduce((s,d) => s + d.amount, 0);
+  const week  = open.filter(d => { const dl = daysLeft(d.deadline); return dl >= 0 && dl <= 7; })
+                    .sort((a,b) => a.deadline - b.deadline);
+  const expired = deductions.filter(d => (d.status === "new" || d.status === "gathering") && daysLeft(d.deadline) < 0);
+  const expiredSum = expired.reduce((s,d) => s + d.amount, 0);
+
+  document.getElementById("statTotal").textContent = fmt(total);
+  document.getElementById("statTotalNote").textContent = deductions.length + " deductions on file this quarter";
+  document.getElementById("statRisk").textContent = fmt(risk);
+  document.getElementById("statRiskNote").textContent = open.length + " open deductions not yet resolved";
+  document.getElementById("statWon").textContent = fmt(wonSum);
+  document.getElementById("statWonNote").textContent = won.length + " dispute(s) won back this quarter";
+  document.getElementById("statWeek").textContent = week.length;
+  document.getElementById("statWeekNote").textContent = week.length ? fmt(week.reduce((s,d)=>s+d.amount,0)) + " riding on this week's deadlines" : "Nothing due in the next 7 days";
+  document.getElementById("expiredTotal").textContent = fmt(expiredSum);
+
+  const q = "Q" + (Math.floor(new Date().getMonth()/3)+1) + " " + new Date().getFullYear();
+  document.getElementById("qtrLabel").textContent = q;
+
+  const dueEl = document.getElementById("dueWeekList");
+  if (!week.length){ dueEl.innerHTML = '<p class="toolbar-note">No deadlines in the next 7 days.</p>'; }
+  else {
+    dueEl.innerHTML = week.map(d =>
+      '<div class="minirow"><span><b>' + d.id + '</b> · ' + d.typeLabel + ' · ' + d.po +
+      '<br><span style="color:var(--red); font-weight:700;">' + daysLeft(d.deadline) + ' day(s) left</span></span>' +
+      '<span style="text-align:right;"><span class="amt">' + fmt(d.amount) + '</span><br>' +
+      '<button class="linkbtn" data-goto="' + d.id + '">Open in tracker →</button></span></div>'
+    ).join("");
+    dueEl.querySelectorAll("[data-goto]").forEach(b => b.addEventListener("click", () => {
+      showTab("tracker");
+      const s = document.getElementById("trackerSearch"); s.value = b.dataset.goto; renderTracker();
+    }));
+  }
+
+  const byType = {};
+  deductions.forEach(d => { byType[d.typeLabel] = (byType[d.typeLabel] || 0) + d.amount; });
+  document.getElementById("byTypeList").innerHTML =
+    Object.keys(byType).sort((a,b) => byType[b]-byType[a]).map(t =>
+      '<div class="minirow"><span>' + t + '</span><span class="amt">' + fmt(byType[t]) + '</span></div>'
+    ).join("");
+  tickClock();
+}
+
+function tickClock(){
+  const open = deductions.filter(d => OPEN.includes(d.status) && d.deadline > new Date())
+                         .sort((a,b) => a.deadline - b.deadline);
+  const valEl = document.getElementById("nextDeadlineVal");
+  const whatEl = document.getElementById("nextDeadlineWhat");
+  if (!open.length){ valEl.textContent = "—"; whatEl.textContent = "No open deadlines."; return; }
+  const d = open[0];
+  let ms = d.deadline - Date.now(); if (ms < 0) ms = 0;
+  const dd = Math.floor(ms / DAY), hh = Math.floor(ms % DAY / 3600000),
+        mm = Math.floor(ms % 3600000 / 60000), ss = Math.floor(ms % 60000 / 1000);
+  valEl.textContent = dd + "d " + String(hh).padStart(2,"0") + "h " + String(mm).padStart(2,"0") + "m " + String(ss).padStart(2,"0") + "s";
+  whatEl.textContent = d.id + " · " + d.typeLabel + " · " + d.po + " · " + fmt(d.amount) + " — dispute window closes " +
+    d.deadline.toLocaleDateString("en-US",{weekday:"short", month:"short", day:"numeric"});
+}
+
+/* ---------- Tracker ---------- */
+let curFilter = "all";
+document.querySelectorAll("#filterChips .chip").forEach(chip =>
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#filterChips .chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active"); curFilter = chip.dataset.filter; renderTracker();
+  }));
+document.getElementById("trackerSearch").addEventListener("input", renderTracker);
+
+function statusOptions(sel){
+  return STATUSES.map(([v,l]) => '<option value="' + v + '"' + (v===sel ? ' selected' : '') + '>' + l + '</option>').join("");
+}
+function renderTracker(){
+  const q = document.getElementById("trackerSearch").value.trim().toLowerCase();
+  const rows = deductions.filter(d => {
+    if (curFilter === "open" && !OPEN.includes(d.status)) return false;
+    if (curFilter === "due7" && !(OPEN.includes(d.status) && daysLeft(d.deadline) >= 0 && daysLeft(d.deadline) <= 7)) return false;
+    if (curFilter === "submitted" && d.status !== "submitted") return false;
+    if (curFilter === "won" && d.status !== "won") return false;
+    if (curFilter === "lost" && d.status !== "lost") return false;
+    if (q && !(d.id + " " + d.po + " " + d.inv + " " + d.code).toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a,b) => a.deadline - b.deadline);
+
+  const body = document.getElementById("trackerBody");
+  body.innerHTML = rows.map(d => {
+    const dl = daysLeft(d.deadline);
+    const closed = (d.status === "won" || d.status === "lost");
+    let dayCell;
+    if (closed) dayCell = '<span class="days" style="color:var(--mut);">closed</span>';
+    else if (dl < 0) dayCell = '<span class="days exp">EXPIRED ' + Math.abs(dl) + 'd ago</span>';
+    else dayCell = '<span class="days ' + (dl <= 2 ? "crit" : dl <= 7 ? "warn" : "ok") + '">' + dl + ' day(s)</span>';
+    return '<tr>' +
+      '<td><b>' + d.id + '</b><br><span style="color:var(--mut); font-size:12px;">' + d.retailer + ' · ' +
+        d.date.toLocaleDateString("en-US",{month:"short", day:"numeric"}) + '<br>' + d.code + '</span></td>' +
+      '<td><span class="pill ' + d.type + '">' + d.typeLabel + '</span></td>' +
+      '<td>' + d.po + '<br><span style="color:var(--mut); font-size:12px;">' + d.inv + '</span></td>' +
+      '<td class="amt">' + fmt(d.amount) + '</td>' +
+      '<td>' + d.deadline.toLocaleDateString("en-US",{month:"short", day:"numeric", year:"numeric"}) + '</td>' +
+      '<td>' + dayCell + '</td>' +
+      '<td><select class="status" data-status-for="' + d.id + '">' + statusOptions(d.status) + '</select></td>' +
+      '<td><button class="linkbtn" data-packet-for="' + d.id + '">Build packet</button></td>' +
+    '</tr>';
+  }).join("");
+
+  body.querySelectorAll("[data-status-for]").forEach(sel =>
+    sel.addEventListener("change", () => {
+      const d = deductions.find(x => x.id === sel.dataset.statusFor);
+      d.status = sel.value; renderTracker(); renderDashboard(); renderPacketOptions();
+    }));
+  body.querySelectorAll("[data-packet-for]").forEach(b =>
+    b.addEventListener("click", () => {
+      document.getElementById("packetSelect").value = b.dataset.packetFor;
+      renderPacket(); showTab("packet");
+    }));
+
+  const shown = rows.reduce((s,d) => s + d.amount, 0);
+  document.getElementById("trackerSummary").textContent =
+    "Showing " + rows.length + " of " + deductions.length + " deductions · " + fmt(shown) + " in view";
+}
+
+/* ---------- Packet generator ---------- */
+const packetSelect = document.getElementById("packetSelect");
+function renderPacketOptions(){
+  const cur = packetSelect.value;
+  packetSelect.innerHTML = deductions.map(d =>
+    '<option value="' + d.id + '">' + d.id + ' · ' + d.typeLabel + ' · ' + d.po + ' · ' + fmt(d.amount) +
+    ' · deadline ' + d.deadline.toLocaleDateString("en-US",{month:"short", day:"numeric"}) + '</option>').join("");
+  if (deductions.some(d => d.id === cur)) packetSelect.value = cur;
+  renderPacket();
+}
+packetSelect.addEventListener("change", renderPacket);
+
+function curDeduction(){ return deductions.find(d => d.id === packetSelect.value) || deductions[0]; }
+
+function renderPacket(){
+  const d = curDeduction(); if (!d) return;
+  const keys = Object.keys(d.docs);
+  const listEl = document.getElementById("docList");
+  listEl.innerHTML = keys.map(k =>
+    '<div class="docrow"><input type="checkbox" data-doc="' + k + '"' + (d.docs[k] ? " checked" : "") + '>' +
+    '<div><div class="dn">' + DOCS[k].name + '</div><div class="dd">' + DOCS[k].desc + '</div></div>' +
+    '<span class="tag ' + (d.docs[k] ? "have" : "miss") + '">' + (d.docs[k] ? "On file" : "Missing") + '</span></div>'
+  ).join("");
+  listEl.querySelectorAll("[data-doc]").forEach(cb =>
+    cb.addEventListener("change", () => { d.docs[cb.dataset.doc] = cb.checked; renderPacket(); }));
+
+  const have = keys.filter(k => d.docs[k]);
+  const pct = Math.round(have.length / keys.length * 100);
+  document.getElementById("docMeter").style.width = pct + "%";
+  document.getElementById("docMeterNote").textContent = have.length + " of " + keys.length +
+    " proof documents on file (" + pct + "% packet complete)" +
+    (pct === 100 ? " — packet is ready to upload." : " — gather the missing items before the deadline.");
+
+  const today = new Date().toLocaleDateString("en-US",{month:"long", day:"numeric", year:"numeric"});
+  const dl = d.deadline.toLocaleDateString("en-US",{month:"long", day:"numeric", year:"numeric"});
+  const enclosures = have.length ? have.map(k => "• " + DOCS[k].name).join("\n") : "• (none attached yet)";
+  const missing = keys.filter(k => !d.docs[k]).map(k => DOCS[k].name);
+  const lines = [
+    "Harvest Valley Foods, Inc.",
+    "Accounts Receivable — Deductions",
+    "[Your street address] · [City, ST ZIP]",
+    "",
+    today,
+    "",
+    "Re: Dispute of deduction " + d.id + " — " + fmt(d.amount),
+    "    " + d.code,
+    "    Purchase order: " + d.po + " · Invoice: " + d.inv,
+    "    Dispute deadline: " + dl,
+    "",
+    "To the deductions review team:",
+    "",
+    "We dispute deduction " + d.id + " in the amount of " + fmt(d.amount) + ", taken against invoice " + d.inv + " (" + d.po + ").",
+    "",
+    "Our records — documented in the evidence packet enclosed with this dispute — show this shipment was executed in compliance with the purchase order terms, and the deduction was taken in error. We request full reversal of " + fmt(d.amount) + " and restoration of the amount to our account.",
+    "",
+    "Enclosed evidence:",
+    enclosures
+  ];
+  if (missing.length) lines.push("", "Note: the following items are still being gathered and will be supplemented before the dispute deadline: " + missing.join(", ") + ".");
+  lines.push("", "Please reference deduction " + d.id + " in all correspondence. Questions: accounts receivable, Harvest Valley Foods, Inc.", "", "Respectfully,", "Harvest Valley Foods, Inc.");
+  document.getElementById("letterText").textContent = lines.join("\n");
+}
+
+document.getElementById("btnCopyLetter").addEventListener("click", async () => {
+  const txt = document.getElementById("letterText").textContent;
+  let ok = false;
+  try { await navigator.clipboard.writeText(txt); ok = true; }
+  catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand("copy"); } catch(e2){ ok = false; }
+    ta.remove();
+  }
+  const msg = document.getElementById("copiedMsg");
+  msg.style.display = ok ? "inline" : "none";
+  if (ok) setTimeout(() => { msg.style.display = "none"; }, 2500);
+});
+document.getElementById("btnPrintPacket").addEventListener("click", () => window.print());
+
+/* ---------- Pre-shipment checklist ---------- */
+const SHIP_ITEMS = [
+  {key:"ontime", name:"On-time: load tenders inside the ship window / arrives by MABD",
+   desc:"OTIF on-time failure fine: 3% of the cost of goods of non-compliant cases.",
+   fine:(c) => 0.03 * c.cases * c.cogs},
+  {key:"infull", name:"In-full: full case quantity picked and verified against the PO",
+   desc:"OTIF in-full failure fine: 3% of the cost of goods of shorted cases.",
+   fine:(c) => 0.03 * c.cases * c.cogs},
+  {key:"asn", name:"ASN transmitted accurately before the truck leaves",
+   desc:"SQEP ASN defect: $200 admin fee + $10 per pallet.",
+   fine:(c) => 200 + 10 * c.pallets},
+  {key:"barcode", name:"Case & pallet barcodes print-checked and scannable",
+   desc:"SQEP barcode defect: $200 admin fee + $2 per case.",
+   fine:(c) => 200 + 2 * c.cases},
+  {key:"tihi", name:"Pallet build matches the PO Ti/Hi and labeling spec",
+   desc:"SQEP pallet defect: $4 per pallet.",
+   fine:(c) => 4 * c.pallets},
+  {key:"bol", name:"BOL complete and matching the ASN and invoice",
+   desc:"Load paperwork defect: $20 per load.",
+   fine:() => 20}
+];
+const shipState = {}; SHIP_ITEMS.forEach(i => shipState[i.key] = false);
+shipState.ontime = true; shipState.asn = true;
+
+function shipCtx(){
+  return {
+    cases: Math.max(0, parseFloat(document.getElementById("psCases").value) || 0),
+    pallets: Math.max(0, parseFloat(document.getElementById("psPallets").value) || 0),
+    cogs: Math.max(0, parseFloat(document.getElementById("psCogs").value) || 0)
+  };
+}
+function renderShip(){
+  const c = shipCtx();
+  const listEl = document.getElementById("shipList");
+  listEl.innerHTML = SHIP_ITEMS.map(i => {
+    const f = i.fine(c), done = shipState[i.key];
+    return '<div class="shipitem"><input type="checkbox" data-ship="' + i.key + '"' + (done ? " checked" : "") + '>' +
+      '<div><div class="sn">' + i.name + '</div><div class="sd">' + i.desc + '</div></div>' +
+      '<div class="fine"><div class="fv">' + fmt(f) + '</div>' +
+      '<div class="fs ' + (done ? "avoided" : "exposed") + '">' + (done ? "Cleared" : "At risk") + '</div></div></div>';
+  }).join("");
+  listEl.querySelectorAll("[data-ship]").forEach(cb =>
+    cb.addEventListener("change", () => { shipState[cb.dataset.ship] = cb.checked; renderShip(); }));
+  let exposed = 0, avoided = 0;
+  SHIP_ITEMS.forEach(i => { if (shipState[i.key]) avoided += i.fine(c); else exposed += i.fine(c); });
+  document.getElementById("psExposed").textContent = fmt(exposed);
+  document.getElementById("psAvoided").textContent = fmt(avoided);
+  const total = exposed + avoided;
+  document.getElementById("psScore").textContent = total ? Math.round(avoided / total * 100) + "%" : "100%";
+}
+["psCases","psPallets","psCogs","psPO"].forEach(id =>
+  document.getElementById(id).addEventListener("input", renderShip));
+document.getElementById("btnResetShip").addEventListener("click", () => {
+  SHIP_ITEMS.forEach(i => shipState[i.key] = false); renderShip();
+});
+
+/* ---------- Init ---------- */
+renderDashboard();
+renderTracker();
+renderPacketOptions();
+renderShip();
+setInterval(tickClock, 1000);
+setInterval(() => { renderTracker(); renderDashboard(); }, 60000);
+</script>
+</body>
+</html>
